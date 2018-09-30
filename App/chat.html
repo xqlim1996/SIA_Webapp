@@ -34,12 +34,13 @@
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-              <a class="nav-link" href="index.html">Home
-                <span class="sr-only">(current)</span>
+              <a class="nav-link" href="../index.html">Home
+                
               </a>
             </li>
             <li class="nav-item active" href="#">
-              <a class="nav-link" href="#">Chat</a>
+              <a class="nav-link" href="chat.html">Chat</a>
+                <span class="sr-only">(current)</span>
             </li>
             <li class="nav-item" >
               <a class="nav-link" href="itinerary.html">Itinerary Planner</a>
@@ -204,14 +205,14 @@
       $(".chat_container_left").remove();
       $(".chat_container_right").remove();
       
-
       console.log("updateMessages running with: ", name);
       db.collection("conversations").where("customer", "==", name)
       .onSnapshot(function(querySnapshot) {
         var messages = [];
         querySnapshot.forEach(function(doc) {
-            //console.log(doc.data()); 
+             
             var currentMessage = doc.data().messages;
+            console.log(currentMessage);
 
             var right_counter = 0;
             var chatbox_right_text = document.getElementsByClassName('message-right');
@@ -224,6 +225,7 @@
             var chatbox_left_time = document.getElementsByClassName('time-left');
 
             for (i = 0; i<currentMessage.length; i++){
+              console.log("for loop running");
 
               if (currentMessage[i].sender == "Staff"){
                 if (typeof chatbox_right_text[right_counter] === "undefined"){
@@ -293,17 +295,34 @@
         var users = [];
         var sidebar_items = document.getElementsByClassName("sidebar-username");
 
+        console.log("sidebar_items: " + sidebar_items);
+
         querySnapshot.forEach(function(doc) {
           var customer = doc.data().customer;
           users.push(customer);
           console.log(users)
         });      
 
+        var makeNew;
         for (i = 0; i < users.length; i++){
-          if (typeof sidebar_items[i] === "undefined"){
-                  console.log(users);
-                  newSideBarItem(users[i]);
-                }
+          
+          var sidebar_length = sidebar_items.length;
+          console.log("sidebar_length: " + sidebar_length);
+          var user_id;
+
+          if (!(users[i] in sidebar_items)){
+            makeNew = true;
+            user_id = i;
+            console.log("makeNew" + makeNew);
+          }
+
+          if (makeNew == true && sidebar_length < users.length){
+            console.log("made new sidebaritem")
+            console.log(users);
+            makeNew = false;
+            newSideBarItem(users[user_id]);
+          }
+                 
           //sidebar_items[i].innerHTML = users[i];
         }
   
@@ -340,7 +359,6 @@
                   console.error("Error updating document: ", error);
               });
 
-              document.getElementsByName("name")[0].value = "";
               document.getElementsByName("message")[0].value = "";
                   } else {
               // doc.data() will be undefined in this case
@@ -349,6 +367,8 @@
       }).catch(function(error) {
           console.log("Error getting document:", error);
       });
+
+    document.getElementsByName("message")[0].value = "";
 
     }
 
@@ -373,6 +393,8 @@
           console.log("Error getting documents: ", error);
       });
     }
+
+    document.getElementsByName("message")[0].value = "";
 
     updateSidebar();   
 
